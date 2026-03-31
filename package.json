@@ -1,0 +1,14 @@
+{
+  "name": "techglareloots",
+  "version": "1.0.0",
+  "description": "API to read recent tweets and forward matching loot deals to Telegram",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
