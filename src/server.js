@@ -16,8 +16,22 @@ const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 const X_USERNAME = process.env.X_USERNAME || "Tech_glareOffl";
 
-const KEYWORD_REGEX = /\b(?:lowest price|loot)\b/i;
+const KEYWORD_PATTERNS = [
+  /\blowest\s*price\b/i,
+  /\blow\s*price\b/i,
+  /\bbest\s*price\b/i,
+  /\bbottom\s*price\b/i,
+  /\bprice\s*drop\b/i,
+  /\bdeal\s*price\b/i,
+  /\bloot\b/i,
+  /\blooted\b/i,
+  /\blooting\b/i
+];
 const processedTweetIds = new Set();
+
+function containsTargetKeyword(text) {
+  return KEYWORD_PATTERNS.some((pattern) => pattern.test(text || ""));
+}
 
 function loadEnvFile(filePath) {
   if (!fs.existsSync(filePath)) {
@@ -106,7 +120,7 @@ function buildTweetRecords(payload) {
   );
 
   return (payload.data || [])
-    .filter((tweet) => KEYWORD_REGEX.test(tweet.text || ""))
+    .filter((tweet) => containsTargetKeyword(tweet.text))
     .map((tweet) => {
       const author = usersById.get(tweet.author_id);
       return {

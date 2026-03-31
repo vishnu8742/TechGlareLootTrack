@@ -10,9 +10,12 @@ Small Node.js API that checks posts from `Tech_glareOffl` from the last 10 minut
 
 ## Matching rule
 
-Posts are checked only from `Tech_glareOffl` and only for:
+Posts are checked only from `Tech_glareOffl` and matched against keyword families such as:
 
 - `lowest price`
+- `low price`
+- `best price`
+- `price drop`
 - `loot`
 
 ## Setup
