@@ -121,7 +121,7 @@ function escapeHtml(value) {
 }
 
 function getStartTimeIso() {
-  return new Date(Date.now() - 10 * 60 * 1000).toISOString();
+  return new Date(Date.now() - 5 * 60 * 1000).toISOString();
 }
 
 async function fetchRecentTweets() {
