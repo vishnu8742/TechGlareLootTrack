@@ -27,10 +27,50 @@ const KEYWORD_PATTERNS = [
   /\blooted\b/i,
   /\blooting\b/i
 ];
+const DISCOUNT_TRIGGER_PATTERNS = [
+  /\b(?:flat\s*)?\d{2,3}\s*%\s*off\b/i,
+  /\boff\s*up\s*to\s*\d{2,3}\s*%\b/i,
+  /\bup\s*to\s*\d{2,3}\s*%\s*off\b/i,
+  /\bextra\s*\d{2,3}\s*%\s*off\b/i,
+  /\bgrab\s*\d{2,3}\s*%\s*off\b/i,
+  /\bget\s*\d{2,3}\s*%\s*off\b/i,
+  /\bdiscount\s+of\s+\d{2,3}\s*%\b/i
+];
 const processedTweetIds = new Set();
 
 function containsTargetKeyword(text) {
-  return KEYWORD_PATTERNS.some((pattern) => pattern.test(text || ""));
+  const normalizedText = text || "";
+
+  return (
+    KEYWORD_PATTERNS.some((pattern) => pattern.test(normalizedText)) ||
+    containsDiscountOffer(normalizedText)
+  );
+}
+
+function containsDiscountOffer(text) {
+  if (!DISCOUNT_TRIGGER_PATTERNS.some((pattern) => pattern.test(text))) {
+    return false;
+  }
+
+  for (const match of text.matchAll(/(\d{2,3})\s*%\s*off\b/gi)) {
+    if (Number(match[1]) > 35) {
+      return true;
+    }
+  }
+
+  for (const match of text.matchAll(/\boff\s*up\s*to\s*(\d{2,3})\s*%\b/gi)) {
+    if (Number(match[1]) > 35) {
+      return true;
+    }
+  }
+
+  for (const match of text.matchAll(/\bdiscount\s+of\s+(\d{2,3})\s*%\b/gi)) {
+    if (Number(match[1]) > 35) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 function loadEnvFile(filePath) {
@@ -92,7 +132,7 @@ async function fetchRecentTweets() {
   const url = new URL("https://api.twitter.com/2/tweets/search/recent");
   url.searchParams.set(
     "query",
-    `from:${X_USERNAME} (("lowest price") OR loot) -is:retweet`
+    `from:${X_USERNAME} (("lowest price") OR "low price" OR "best price" OR "price drop" OR loot OR off OR discount) -is:retweet`
   );
   url.searchParams.set("max_results", "25");
   url.searchParams.set("start_time", getStartTimeIso());

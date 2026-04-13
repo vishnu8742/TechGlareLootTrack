@@ -17,6 +17,9 @@ Posts are checked only from `Tech_glareOffl` and matched against keyword familie
 - `best price`
 - `price drop`
 - `loot`
+- discount-style posts like `40% OFF`, `50 % OFF`, `Flat 60% Off`, `Up to 70% OFF`
+
+`OFF` posts are forwarded only when the discount is greater than `35%`.
 
 ## Setup
 
