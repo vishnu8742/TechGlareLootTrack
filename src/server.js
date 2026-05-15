@@ -25,12 +25,14 @@ const KEYWORD_PATTERNS = [
   /\bdeal\s*price\b/i,
   /\bloot\b/i,
   /\blooted\b/i,
-  /\blooting\b/i
+  /\blooting\b/i,
+  /\bgrab\s*fast\b/i
 ];
 const DISCOUNT_TRIGGER_PATTERNS = [
   /\b(?:flat\s*)?\d{2,3}\s*%\s*off\b/i,
-  /\boff\s*up\s*to\s*\d{2,3}\s*%\b/i,
-  /\bup\s*to\s*\d{2,3}\s*%\s*off\b/i,
+  /\boff\s*up[\s-]*to\s*\d{2,3}\s*%\b/i,
+  /\bup[\s-]*to\s*\d{2,3}\s*%\s*off\b/i,
+  /\bupto\s*\d{2,3}\s*%\s*off\b/i,
   /\bextra\s*\d{2,3}\s*%\s*off\b/i,
   /\bgrab\s*\d{2,3}\s*%\s*off\b/i,
   /\bget\s*\d{2,3}\s*%\s*off\b/i,
@@ -53,19 +55,33 @@ function containsDiscountOffer(text) {
   }
 
   for (const match of text.matchAll(/(\d{2,3})\s*%\s*off\b/gi)) {
-    if (Number(match[1]) > 35) {
+    if (Number(match[1]) > 30) {
       return true;
     }
   }
 
-  for (const match of text.matchAll(/\boff\s*up\s*to\s*(\d{2,3})\s*%\b/gi)) {
-    if (Number(match[1]) > 35) {
+  for (const match of text.matchAll(/\boff\s*up[\s-]*to\s*(\d{2,3})\s*%\b/gi)) {
+    if (Number(match[1]) > 30) {
+      return true;
+    }
+  }
+
+  for (const match of text.matchAll(
+    /\bup[\s-]*to\s*(\d{2,3})\s*%\s*off\b/gi
+  )) {
+    if (Number(match[1]) > 30) {
+      return true;
+    }
+  }
+
+  for (const match of text.matchAll(/\bupto\s*(\d{2,3})\s*%\s*off\b/gi)) {
+    if (Number(match[1]) > 30) {
       return true;
     }
   }
 
   for (const match of text.matchAll(/\bdiscount\s+of\s+(\d{2,3})\s*%\b/gi)) {
-    if (Number(match[1]) > 35) {
+    if (Number(match[1]) > 30) {
       return true;
     }
   }
@@ -132,7 +148,7 @@ async function fetchRecentTweets() {
   const url = new URL("https://api.twitter.com/2/tweets/search/recent");
   url.searchParams.set(
     "query",
-    `from:${X_USERNAME} (("lowest price") OR "low price" OR "best price" OR "price drop" OR loot OR off OR discount) -is:retweet`
+    `from:${X_USERNAME} (("lowest price") OR "low price" OR "best price" OR "price drop" OR "grab fast" OR upto OR loot OR off OR discount) -is:retweet`
   );
   url.searchParams.set("max_results", "25");
   url.searchParams.set("start_time", getStartTimeIso());
